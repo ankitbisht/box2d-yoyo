@@ -28,7 +28,11 @@ public:
 	b2World* m_world; 
     b2Body* m_groundBody; 
     void tick(float dt);  
-	
+
+    //virtual void ccTouchesBegan(cocos2d::CCSet* touches, cocos2d::CCEvent* event); 
+   // virtual void ccTouchesMoved(cocos2d::CCSet* touches, cocos2d::CCEvent* event); 
+    virtual void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event); 
+	//void ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event);
     // implement the "static node()" method manually
     CREATE_FUNC(HelloWorld);
 };

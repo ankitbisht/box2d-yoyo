@@ -92,6 +92,7 @@ bool HelloWorld::init()
         //this->addChild(pSprite, 0);
 
 		///////////////////////////////////////////
+		this->setTouchEnabled(true);
 		CCSize screenSize = CCDirector::sharedDirector()->getWinSize();
 
 		_ball = CCSprite::create("acorn.png");
@@ -127,13 +128,13 @@ bool HelloWorld::init()
 		m_groundBody->CreateFixture(&groundBox, 0); 
      
 		// left 
-		//groundBox.Set(b2Vec2(0,screenSize.height/PTM_RATIO), b2Vec2(0,0)); 
-		groundBox.Set(b2Vec2(0,0), b2Vec2(0,0)); 
+		groundBox.Set(b2Vec2(0,screenSize.height/PTM_RATIO), b2Vec2(0,0)); 
+		//groundBox.Set(b2Vec2(0,0), b2Vec2(0,0)); 
 		m_groundBody->CreateFixture(&groundBox, 0); 
      
 		// right 
-		//groundBox.Set(b2Vec2(screenSize.width*1.5f/PTM_RATIO,screenSize.height/PTM_RATIO), b2Vec2(screenSize.width*1.5f/PTM_RATIO,0)); 
-		groundBox.Set(b2Vec2(screenSize.width*1.5f/PTM_RATIO,0), b2Vec2(screenSize.width*1.5f/PTM_RATIO,0));
+		groundBox.Set(b2Vec2(screenSize.width/PTM_RATIO,screenSize.height/PTM_RATIO), b2Vec2(screenSize.width/PTM_RATIO,0)); 
+		//groundBox.Set(b2Vec2(screenSize.width*1.5f/PTM_RATIO,0), b2Vec2(screenSize.width*1.5f/PTM_RATIO,0));
 		m_groundBody->CreateFixture(&groundBox, 0); 
 
 		/////////////////////
@@ -145,14 +146,14 @@ bool HelloWorld::init()
 		_body = m_world->CreateBody(&ballBodyDef);  
       
 		b2CircleShape circle;  
-		circle.m_radius = 26.0/PTM_RATIO;  
+		circle.m_radius = 15.0/PTM_RATIO;  
       
-		b2FixtureDef ballShapeDef;  
-		ballShapeDef.shape = &circle;  
-		ballShapeDef.density = 1.0f;  
-		ballShapeDef.friction = 0.2f;  
+		b2FixtureDef ballShapeDef;
+		ballShapeDef.shape = &circle;
+		ballShapeDef.density = 1.0f;
+		ballShapeDef.friction = 0.2f;
 		ballShapeDef.restitution = 0.8f;  
-		_body->CreateFixture(&ballShapeDef);  
+		_body->CreateFixture(&ballShapeDef);
       
 		schedule(schedule_selector(HelloWorld::tick)); 
 
@@ -179,4 +180,37 @@ void HelloWorld::tick(float dt)
             ballData->setRotation( -1 * CC_RADIANS_TO_DEGREES(b->GetAngle()));  
         }   
     }  
-}  
+}
+
+void HelloWorld::ccTouchesEnded(cocos2d::CCSet* touches, cocos2d::CCEvent* event)
+{
+		CCTouch* touch = (CCTouch*)( touches->anyObject() );
+		CCPoint location = touch->getLocation();
+		
+		//创建周围世界边框，在屏幕的周围一圈  
+		CCSprite *temp_ball = CCSprite::create("acorn.png");
+		temp_ball->setPosition(location);
+		this->addChild(temp_ball);
+
+		
+		b2Body *temp_body;
+
+		b2BodyDef ballBodyDef;  
+		ballBodyDef.type = b2_dynamicBody;  
+		ballBodyDef.position.Set(location.x/PTM_RATIO, location.y/PTM_RATIO);  
+		ballBodyDef.userData = temp_ball;  
+		temp_body = m_world->CreateBody(&ballBodyDef);  
+      
+		b2CircleShape circle;  
+		circle.m_radius = 14.0/PTM_RATIO;
+      
+		b2FixtureDef ballShapeDef;  
+		ballShapeDef.shape = &circle;  
+		ballShapeDef.density = 1.0f;  
+		ballShapeDef.friction = 0.2f;  
+		ballShapeDef.restitution = 0.8f;  
+		temp_body->CreateFixture(&ballShapeDef);
+		
+		
+		CCLog("touch x %f, %f", location.x,location.y);
+}
